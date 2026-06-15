@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./lambdas:/lambdas
+      - ./model:/model
+      - ./data:/data
+    environment:
+      - LOCAL_MODE=true
+      - MODEL_PATH=/model/artifacts/propensity_model.joblib
+      - FEATURE_PATH=/model/artifacts/feature_list.csv
+      - DATA_PATH=/data/train.csv
+      - PYTHONPATH=/app:/lambdas
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
